@@ -1,9 +1,9 @@
 import User from '../infra/typeorm/entities/User';
 import {hash} from 'bcryptjs';
 import AppError from '../../../shared/errors/AppError';
-import IUsersRepository from '../repositories/IUsersRepository';
 import IHashProvider from '../providers/HashProvider/models/IHashProvider';
 import { inject, injectable } from 'tsyringe';
+import IUsersRepository from '../repositories/IUsersRepository';
 
 
 interface Request {

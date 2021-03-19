@@ -26,9 +26,6 @@ class UpdateUserAvatarService {
 
   }
   public async execute({user_id,avatarFilename}:Request):Promise<User>{
-    const usersRepository = getRepository(User);
-
-
     const user = await this.usersRepository.findByID(user_id);
 
     if (!user) {

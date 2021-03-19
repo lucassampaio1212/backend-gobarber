@@ -1,45 +1,47 @@
 import AppError from '@shared/errors/AppError';
-import IUsersRepository from '../repositories/IUsersRepository';
-import { injectable, inject } from 'tsyringe';
 
-import IHashProvider from '../providers/HashProvider/models/IHashProvider';
+import FakeUsersRepository from '../repositories/fakes/FakeUsersRepository';
+import CreateUserService from './CreateUserService';
+import FakeHashProvider from '../providers/HashProvider/fakes/FakeHashProvider';
 
-import User from '../infra/typeorm/entities/User';
+describe('CreateUser', () => {
+  it('should be able to create a new user', async () => {
+    const fakeUsersRepository = new FakeUsersRepository();
+    const fakeHashProvider = new FakeHashProvider();
 
-interface IRequest {
-  name: string;
-  email: string;
-  password: string;
-}
-@injectable()
-class CreateUserService {
-
-  constructor(
-    @inject('UsersRepository')
-    private usersRepository: IUsersRepository,
-
-    @inject('HashProvider')
-    private hashProvider : IHashProvider,
-    ){ }
-
-  public async execute({ name, email, password }: IRequest): Promise<User> {
-    const checkUserExists = await this.usersRepository.findByEmail(email);
-
-    if (checkUserExists) {
-      throw new AppError('Email address already used.');
-    }
-
-    const hashedPassword = await this.hashProvider.generateHash(password);
-
-    const user = await this.usersRepository.create({
-      name,
-      email,
-      password: hashedPassword,
+    const createUser = new CreateUserService(
+      fakeUsersRepository,
+      fakeHashProvider,
+    );
+    const user = await createUser.execute({
+      name: 'John Doe',
+      email: 'johndoe@example.com',
+      password: '123123',
     });
 
+    expect(user).toHaveProperty('id');
+  });
 
-    return user;
-  }
-}
+  it('should not be able to create a new user with email from another', async () => {
+    const fakeUsersRepository = new FakeUsersRepository();
+    const fakeHashProvider = new FakeHashProvider();
+    const createUser = new CreateUserService(
+      fakeUsersRepository,
+      fakeHashProvider,
+    );
 
-export default CreateUserService;
+    await createUser.execute({
+      name: 'John Doe',
+      email: 'johndoe@example.com',
+      password: '123123',
+    });
+
+   await expect(
+      createUser.execute({
+        name: 'John Doe',
+        email: 'johndoe@example.com',
+        password: '123123',
+      }),
+    ).rejects.toBeInstanceOf(AppError);
+  });
+});
