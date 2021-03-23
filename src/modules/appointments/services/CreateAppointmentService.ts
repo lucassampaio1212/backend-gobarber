@@ -1,12 +1,10 @@
 import { isBefore, startOfHour, getHours, format } from 'date-fns';
 import Appointment from '@modules/appointments/infra/typeorm/entities/Appointments';
-import AppointmentsRepository from '../infra/typeorm/repositories/AppointmentsRepository';
-
+import ICacheProvider from '@shared/container/providers/CacheProvider/models/ICacheprovider';
 import AppError from '../../../shared/errors/AppError';
 import IAppointmentRepository from '../repositories/IAppointmentsRepository';
 import { inject, injectable } from 'tsyringe';
 import INotificationsRepository from '@modules/notifications/repositories/INotificationsRepository';
-import { roundToNearestMinutesWithOptions } from 'date-fns/fp';
 
 
 interface IRequest {
@@ -23,6 +21,8 @@ class CreateAppointmentService {
 
     @inject('NotificationsRepository')
     private notificationsRepository: INotificationsRepository,
+    @inject('CacheProvider')
+    private cacheProvider: ICacheProvider,
     ) {
 
   }
@@ -42,7 +42,7 @@ class CreateAppointmentService {
       throw new AppError('You can only create an appointment between 8am and 5pm');
     }
 
-    const findAppointmentInSameDate = await this.appointmentsRepository.findByDate(appointmentDate)
+    const findAppointmentInSameDate = await this.appointmentsRepository.findByDate(appointmentDate,provider_id)
 
    if (findAppointmentInSameDate) {
      throw new AppError('This appointment is already booked');
@@ -55,7 +55,15 @@ class CreateAppointmentService {
    await this.notificationsRepository.create({
      recipient_id: provider_id,
      content: `Novo agendamento para dia ${dateFormatted}`
-   })
+   });
+
+   await this.cacheProvider.invalidate(
+    `provider-appointments:${provider_id}:${format(
+      appointmentDate,
+      'yyyy-M-d',
+    )}`,
+  );
+
 
    return appointment;
   }
