@@ -29,6 +29,7 @@ describe('CreateAppointment', () => {
       date: new Date(2021, 4, 10, 13),
       provider_id: 'provider-id',
       user_id: 'user-id',
+      provider: true,
     });
 
     expect(appointment).toHaveProperty('id');
@@ -43,6 +44,7 @@ describe('CreateAppointment', () => {
       date: appointmentDate,
       provider_id: 'provider-id',
       user_id: 'user-id',
+      provider: true,
     });
 
     await expect(
@@ -50,6 +52,7 @@ describe('CreateAppointment', () => {
         date: appointmentDate,
         provider_id: 'provider-id',
         user_id: 'user-id',
+        provider: true,
       }),
     ).rejects.toBeInstanceOf(AppError);
   });
@@ -64,6 +67,7 @@ describe('CreateAppointment', () => {
         date: new Date(2021, 4, 10, 11),
         provider_id: 'provider-id',
         user_id: 'user-id',
+        provider: true,
       }),
     ).rejects.toBeInstanceOf(AppError);
   });
@@ -78,6 +82,7 @@ describe('CreateAppointment', () => {
         date: new Date(2021, 4, 10, 13),
         provider_id: 'user-id',
         user_id: 'user-id',
+        provider: true,
       }),
     ).rejects.toBeInstanceOf(AppError);
   });
@@ -92,6 +97,7 @@ describe('CreateAppointment', () => {
         date: new Date(2021, 4, 11, 7),
         provider_id: 'user-id',
         user_id: 'provider-id',
+        provider: true,
       }),
     ).rejects.toBeInstanceOf(AppError);
 
@@ -100,6 +106,7 @@ describe('CreateAppointment', () => {
         date: new Date(2021, 4, 11, 18),
         provider_id: 'user-id',
         user_id: 'provider-id',
+        provider: true,
       }),
     ).rejects.toBeInstanceOf(AppError);
   });

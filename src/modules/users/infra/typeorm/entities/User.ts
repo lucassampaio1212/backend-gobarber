@@ -17,6 +17,9 @@ class User {
   @Exclude()
   password: string;
 
+  @Column('boolean')
+  provider: boolean;
+
   @Column()
   avatar: string;
 

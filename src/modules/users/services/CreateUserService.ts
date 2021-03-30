@@ -11,6 +11,7 @@ interface Request {
   name: string;
   email: string;
   password: string;
+  provider: boolean;
 }
 
 @injectable()
@@ -26,7 +27,7 @@ class CreateUserService {
     ) {
 
   }
-    public async execute({name,email,password}:Request): Promise<User> {
+    public async execute({name,email,password, provider}:Request): Promise<User> {
 
       const checkUsersExists = await this.usersRepository.findByEmail(email);
 
@@ -40,6 +41,7 @@ class CreateUserService {
         name,
         email,
         password: hashedPassword,
+        provider,
       });
       await this.cacheProvider.invalidatePrefix('providers-list');
 
