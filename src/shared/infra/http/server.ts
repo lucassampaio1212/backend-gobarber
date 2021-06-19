@@ -33,6 +33,6 @@ app.use((err: Error, request: Request, response: Response, _: NextFunction) => {
 });
 
 
-app.listen(3339,() => {
+app.listen(3340,() => {
     console.log("Back-End Initialized On Port 3339")
 })
